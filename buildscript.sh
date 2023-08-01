@@ -366,7 +366,13 @@ YELLOW='\033[1;33m'
 RED='\033[0;31m'
 RESET='\033[0m'
 
+# Get the current directory name
+current_dir=$(basename "$PWD")
 
+# Delete existing zip file if it exists
+if [ -f "${current_dir}.zip" ]; then
+    rm ${current_dir}.zip
+fi
 
 
 echo -e "${YELLOW}Running 'flutter clean'${RESET}"
@@ -383,32 +389,19 @@ echo -e "${RED}2. No${RESET}"
 read -p "$(echo -e "${YELLOW}Your choice (1/2): ${RESET}")" push_choice
 
 if [ "$push_choice" == "1" ]; then
-    echo -e "${YELLOW}4: Step 3.1: Running 'git add .'${RESET}"
+    echo -e "${YELLOW}Running 'git add .'${RESET}"
     git add .
 
-    read -p "$(echo -e "${YELLOW}5: Step 3.2: Please enter commit message: ${RESET}")" commit_message
+    read -p "$(echo -e "${YELLOW}Please enter commit message: ${RESET}")" commit_message
 
-    echo -e "${YELLOW}6: Step 3.3: Running 'git commit -m \"$commit_message\"'${RESET}"
+    echo -e "${YELLOW}Running 'git commit -m \"$commit_message\"'${RESET}"
     git commit -m "$commit_message"
 
-    echo -e "${YELLOW}7: Step 3.4: Running 'git push'${RESET}"
+    echo -e "${YELLOW}Running 'git push'${RESET}"
     git push
 fi
 
 
-
-# # Create zip archive of all files in the directory
-# echo -e "${YELLOW}8: Creating a zip archive of all files in the directory...${RESET}"
-# # zip -r archive.zip ./*
-# jar -cfM archive.zip ./*
-
-# Get the current directory name
-current_dir=$(basename "$PWD")
-
-# Delete existing zip file if it exists
-if [ -f "${current_dir}.zip" ]; then
-    rm ${current_dir}.zip
-fi
 
 # Create zip archive of all files in the directory using 'jar' with the current directory name as the zip file name
 zip_file="${current_dir}.zip"
@@ -416,22 +409,27 @@ echo -e "${YELLOW}8: Creating the zip archive ${zip_file}...${RESET}"
 jar -cfM "$zip_file" ./*
 
 # Check if the user wants to change the app version
-read -p "$(echo -e "${YELLOW}9: Step 4: Do you want to change the app version? ${RESET}(${GREEN}1-yes${RESET} / ${RED}2-no${RESET}): ")" app_version_choice
+echo -e "${YELLOW}Do you want to change the app version ? ${RESET}"
+echo -e "${GREEN}1. Yes${RESET}"
+echo -e "${RED}2. No${RESET}"
+
+read -p "$(echo -e "${YELLOW}Your choice (1/2): ${RESET}")" app_version_choice
+# read -p "$(echo -e "${YELLOW}9: Step 4: Do you want to change the app version? ${RESET}(${GREEN}1-yes${RESET} / ${RED}2-no${RESET}): ")" app_version_choice
 
 if [ "$app_version_choice" == "1" ]; then
-    read -p "$(echo -e "${YELLOW}10: Step 4.1: Enter the new app version: ${RESET}")" app_version
-    read -p "$(echo -e "${YELLOW}11: Step 4.2: Enter the new code version: ${RESET}")" code_version
+    read -p "$(echo -e "${YELLOW}Enter the app version: ${RESET}")" app_version
+    read -p "$(echo -e "${YELLOW}Enter the code version: ${RESET}")" code_version
     combined_version="$app_version+$code_version"
     # Update the pubspec.yaml file with the combined version
     sed -i "s/version: .*/version: $combined_version/g" pubspec.yaml
-    echo -e "${GREEN}12: Version updated to $combined_version in pubspec.yaml${RESET}"
+    echo -e "${GREEN}Version updated to $combined_version in pubspec.yaml${RESET}"
 fi
 
-echo -e "${YELLOW}13: Step 5: Select the environment:${RESET}"
-echo -e "${GREEN}14: 1. Debug${RESET}"
-echo -e "${GREEN}15: 2. Release${RESET}"
+echo -e "${YELLOW}Select the environment:${RESET}"
+echo -e "${GREEN}1. Debug${RESET}"
+echo -e "${GREEN}2. Release${RESET}"
 
-read -p "$(echo -e "${YELLOW}16: Your choice (1/2): ${RESET}")" build_environment
+read -p "$(echo -e "${YELLOW}Your choice (1/2): ${RESET}")" build_environment
 
 build_command="flutter build"
 
@@ -442,8 +440,6 @@ case "$build_environment" in
         ;;
     "2")
         build_env="--release"
-        # build_command="flutter build"
-
         ;;
     *)
         echo -e "${RED}Invalid choice. Exiting.${RESET}"
@@ -451,26 +447,26 @@ case "$build_environment" in
         ;;
 esac
 
-echo -e "${YELLOW}17: Step 6: Select the build option:${RESET}"
-echo -e "${GREEN}18: 1. APK${RESET}"
-echo -e "${GREEN}19: 2. Bundle${RESET}"
-echo -e "${GREEN}20: 3. Both${RESET}"
+echo -e "${YELLOW}Select the build option:${RESET}"
+echo -e "${GREEN}1. APK${RESET}"
+echo -e "${GREEN}2. Bundle${RESET}"
+echo -e "${GREEN}3. Both${RESET}"
 
-read -p "$(echo -e "${YELLOW}21: Your choice (1/2/3): ${RESET}")" build_option
+read -p "$(echo -e "${YELLOW}Your choice (1/2/3): ${RESET}")" build_option
 
 case "$build_option" in
     "1")
-        echo -e "${YELLOW}22: Building APK...${RESET}"
+        echo -e "${YELLOW}Building APK...${RESET}"
         $build_command apk $build_env
         ;;
     "2")
-        echo -e "${YELLOW}23: Building bundle...${RESET}"
-        $build_command appbundle   $build_env
+        echo -e "${YELLOW}Building bundle...${RESET}"
+        $build_command appbundle $build_env
         ;;
     "3")
         echo -e "${YELLOW}24: Building APK and bundle...${RESET}"
-        $build_command apk  $build_env
-        $build_command appbundle   $build_env
+        $build_command apk $build_env
+        $build_command appbundle $build_env
         ;;
     *)
         echo -e "${RED}Invalid choice. Exiting.${RESET}"
@@ -478,4 +474,4 @@ case "$build_option" in
         ;;
 esac
 
-echo -e "${GREEN}25: Thank you for using the script! 😊${RESET}"
+echo -e "${GREEN}Thank you for using the script! 😊 😊 😊${RESET}"
