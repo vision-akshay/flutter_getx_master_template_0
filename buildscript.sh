@@ -381,6 +381,23 @@ flutter clean
 echo -e "${YELLOW}Running 'flutter pub get'${RESET}"
 flutter pub get
 
+# Check if the user wants to change the app version
+echo -e "${YELLOW}Do you want to change the app version ? ${RESET}"
+echo -e "${GREEN}1. Yes${RESET}"
+echo -e "${RED}2. No${RESET}"
+
+read -p "$(echo -e "${YELLOW}Your choice (1/2): ${RESET}")" app_version_choice
+# read -p "$(echo -e "${YELLOW}9: Step 4: Do you want to change the app version? ${RESET}(${GREEN}1-yes${RESET} / ${RED}2-no${RESET}): ")" app_version_choice
+
+if [ "$app_version_choice" == "1" ]; then
+    read -p "$(echo -e "${YELLOW}Enter the app version: ${RESET}")" app_version
+    read -p "$(echo -e "${YELLOW}Enter the code version: ${RESET}")" code_version
+    combined_version="$app_version+$code_version"
+    # Update the pubspec.yaml file with the combined version
+    sed -i "s/version: .*/version: $combined_version/g" pubspec.yaml
+    echo -e "${GREEN}Version updated to $combined_version in pubspec.yaml${RESET}"
+fi
+
 echo -e "${YELLOW}Do you want to push code on Github ? ${RESET}"
 echo -e "${GREEN}1. Yes${RESET}"
 echo -e "${RED}2. No${RESET}"
@@ -408,23 +425,7 @@ zip_file="${current_dir}.zip"
 echo -e "${YELLOW}8: Creating the zip archive ${zip_file}...${RESET}"
 jar -cfM "$zip_file" ./*
 
-# Check if the user wants to change the app version
-echo -e "${YELLOW}Do you want to change the app version ? ${RESET}"
-echo -e "${GREEN}1. Yes${RESET}"
-echo -e "${RED}2. No${RESET}"
-
-read -p "$(echo -e "${YELLOW}Your choice (1/2): ${RESET}")" app_version_choice
-# read -p "$(echo -e "${YELLOW}9: Step 4: Do you want to change the app version? ${RESET}(${GREEN}1-yes${RESET} / ${RED}2-no${RESET}): ")" app_version_choice
-
-if [ "$app_version_choice" == "1" ]; then
-    read -p "$(echo -e "${YELLOW}Enter the app version: ${RESET}")" app_version
-    read -p "$(echo -e "${YELLOW}Enter the code version: ${RESET}")" code_version
-    combined_version="$app_version+$code_version"
-    # Update the pubspec.yaml file with the combined version
-    sed -i "s/version: .*/version: $combined_version/g" pubspec.yaml
-    echo -e "${GREEN}Version updated to $combined_version in pubspec.yaml${RESET}"
-fi
-
+# Select the environment which you want to build 
 echo -e "${YELLOW}Select the environment:${RESET}"
 echo -e "${GREEN}1. Debug${RESET}"
 echo -e "${GREEN}2. Release${RESET}"
@@ -474,4 +475,4 @@ case "$build_option" in
         ;;
 esac
 
-echo -e "${GREEN}Thank you for using the script! 😊 😊 😊${RESET}"
+echo -e "${GREEN}Thank you for using the script! 😊😊${RESET}"
